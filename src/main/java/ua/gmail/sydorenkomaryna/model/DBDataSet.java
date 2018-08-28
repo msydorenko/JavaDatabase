@@ -11,8 +11,8 @@ public class DBDataSet implements DataSet {
     /**
      * Adds assosiation of given name and value to the DataSet
      *
-     * @param name
-     * @param object
+     * @param name is name of column
+     * @param object is value of column
      */
     @Override
     public void put(String name, Object object) {
@@ -22,7 +22,7 @@ public class DBDataSet implements DataSet {
     /**
      * Updates DataSet using new data
      *
-     * @param DataSet new data
+     * @param newData to update current DBDataSet with
      */
     @Override
     public void update(DataSet newData) {
@@ -61,21 +61,42 @@ public class DBDataSet implements DataSet {
      */
     @Override
     public List<Object> getValues(String name) {
-        return new ArrayList<Object>(data.values());
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DBDataSet)) return false;
-        DBDataSet dbDataSet = (DBDataSet) o;
-        return Objects.equals(data, dbDataSet.data);
+    public boolean equals(Object dataSet) {
+        if (dataSet == null) return false;
+        if (this == dataSet) return true;
+        if (!(dataSet instanceof DBDataSet)) return false;
+
+        Set<String> names = this.getNames();
+        Set<String> dataSetNames = ((DBDataSet) dataSet).getNames();
+        if (names.size() != dataSetNames.size()) return false;
+
+        for (String name : names){
+            try {
+                if(!this.get(name).equals(((DBDataSet) dataSet).get(name)))
+                    return false;
+            }catch (Exception e){
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(data);
+        int hashCode = 0;
+        Set<String> names = this.getNames();
+        for (String name : names) {
+            try {
+                hashCode += name.hashCode() + this.get(name).hashCode();
+            } catch (NullPointerException e) {
+                hashCode += 0;
+            }
+        }
+        return hashCode;
     }
 
     @Override
