@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -89,13 +90,62 @@ public class JDBCManager {
         String query = String.format("INSERT INTO public.%1$s %2$s VALUES %3$s",
                 tableName, columnList, valuesList);
         int numRows;
-        try (Statement statement = connection.createStatement()){
-           numRows = statement.executeUpdate(query);
+        try (Statement statement = connection.createStatement()) {
+            numRows = statement.executeUpdate(query);
         } catch (SQLException e) {
             throw e;
         }
         return numRows;
     }
+
+    /**
+     * Delete table in database
+     *
+     * @param tableName
+     * @return 1 if table was deleted
+     * @throws SQLException
+     */
+    public int dropTable(String tableName) throws SQLException {
+        checkIfConnected();
+        String query = "DROP TABLE public." + tableName;
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(query);
+        } catch (SQLException e) {
+            throw e;
+        }
+        return 1;
+    }
+
+    /**
+     * Updates specified table according to condition
+     *
+     * @param tableName
+     * @param condition as pair of column name and value for part of UPDATE statement WHERE column=value
+     * @param data      for update as pairs of column name and value for part of UPDATE statement SET column=value
+     * @return int number of updated rows
+     * @throws SQLException
+     */
+    public int updateRows(String tableName, DataSet condition, DataSet data) throws SQLException {
+        checkIfConnected();
+        StringBuilder query = new StringBuilder(String.format("UPDATE public.%s SET", tableName));
+        Set<String> columns = data.getNames();
+        for (String columnName : columns) {
+            query.append(String.format("%1$s='%2$s',", columnName, data.get(columnName)));
+        }
+        query.replace(query.length() - 1, query.length(), " WHERE ");
+        columns = condition.getNames();
+        for (String colunmName : columns) {
+            query.append(String.format("%1$s = '%2$s'", colunmName, condition.get(colunmName)));
+        }
+        int numRows = -1;
+        try(Statement statement = connection.createStatement()){
+            numRows = statement.executeUpdate(query.toString());
+        } catch (SQLException e) {
+            throw e;
+        }
+        return numRows;
+    }
+
 
     public boolean isConnected() {
         return (connection != null);
