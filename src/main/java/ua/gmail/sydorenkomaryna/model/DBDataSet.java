@@ -11,12 +11,23 @@ public class DBDataSet implements DataSet {
     /**
      * Adds assosiation of given name and value to the DataSet
      *
-     * @param name is name of column
+     * @param name   is name of column
      * @param object is value of column
      */
     @Override
     public void put(String name, Object object) {
         data.put(name, object);
+    }
+
+    /**
+     * Returns value which specied name is mapped
+     *
+     * @param name is name key from DataSet
+     * @return Object from data Map
+     */
+    @Override
+    public Object get(String name) {
+        return data.get(name);
     }
 
     /**
@@ -33,17 +44,6 @@ public class DBDataSet implements DataSet {
     }
 
     /**
-     * Returns value which specied name is mapped
-     *
-     * @param name is name key from DataSet
-     * @return Object from data Map
-     */
-    @Override
-    public Object get(String name) {
-        return data.get(name);
-    }
-
-    /**
      * Returns Set of String names keys from DataSet
      *
      * @return Set of String names keys
@@ -56,15 +56,14 @@ public class DBDataSet implements DataSet {
     /**
      * Returns List of values from DataSet
      *
-     * @param name is value of key
      * @return List<Object>
      */
     @Override
-    public List<Object> getValues(String name) {
+    public List<Object> getValues() {
         return new ArrayList<>(data.values());
     }
 
-    @Override
+   @Override
     public boolean equals(Object dataSet) {
         if (dataSet == null) return false;
         if (this == dataSet) return true;
@@ -74,15 +73,36 @@ public class DBDataSet implements DataSet {
         Set<String> dataSetNames = ((DBDataSet) dataSet).getNames();
         if (names.size() != dataSetNames.size()) return false;
 
-        for (String name : names){
-            try {
-                if(!this.get(name).equals(((DBDataSet) dataSet).get(name)))
-                    return false;
-            }catch (Exception e){
-                return false;
+       if (checkNames(names, dataSetNames)) return false;
+
+       if (checkValues((DBDataSet) dataSet, names)) return false;
+       return true;
+    }
+
+    private boolean checkValues(DBDataSet dataSet, Set<String> names) {
+        for (String name : names) {
+             try {
+                 if (!this.get(name).equals(dataSet.get(name)))
+                     return false;
+             } catch (Exception e) {
+                 return true;
+             }
+         }
+        return false;
+    }
+
+    private boolean checkNames(Set<String> names, Set<String> dataSetNames) {
+        for (String nameFirs : names) {
+            for (String nameSecond : dataSetNames) {
+                try {
+                    if(!nameFirs.equals(nameSecond))
+                        return false;
+                }catch (Exception e){
+                    return true;
+                }
             }
         }
-        return true;
+        return false;
     }
 
     @Override

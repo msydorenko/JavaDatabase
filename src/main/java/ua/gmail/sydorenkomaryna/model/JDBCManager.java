@@ -1,17 +1,15 @@
 package ua.gmail.sydorenkomaryna.model;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * Manages data in database
  */
-public class JDBCManager {
+public class JDBCManager implements DBManager {
     private Connection connection;
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/sqlcmd";
     private static final String USER_NAME = "postgres";
@@ -24,6 +22,7 @@ public class JDBCManager {
      * @param userName
      * @param password
      */
+    @Override
     public void makeConnection(String dbName, String userName, String password) {
         if (connection != null) {
             return;
@@ -31,10 +30,10 @@ public class JDBCManager {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("PostgreSQL JDBC Driver is not in the library path!", e);
+            throw new RuntimeException("JDBC Driver PostgreSQL is not in the library path!", e);
         }
         try {
-            DriverManager.getConnection(dbName, userName, password);
+            connection = DriverManager.getConnection(dbName, userName, password);
         } catch (SQLException e) {
             throw new RuntimeException(String.format("Connection failed to " +
                     "database: %s as user: %s , url: %s ", dbName, userName), e);
@@ -44,6 +43,7 @@ public class JDBCManager {
     /**
      * Creates table with specified names and columns. All columns are varchar(40)
      */
+    @Override
     public int createTables(String name, Set<String> columns) throws SQLException {
         StringBuilder query = new StringBuilder("CREATE TABLE " + name + " (");
         for (String col : columns) {
@@ -62,6 +62,7 @@ public class JDBCManager {
     /**
      * Close database connection if it is open
      */
+    @Override
     public void closeConnection() throws SQLException {
         if (connection != null) {
             connection.close();
@@ -76,6 +77,7 @@ public class JDBCManager {
      * @return int number of inserted rows
      * @throws SQLException
      */
+    @Override
     public int insertData(String tableName, DataSet data) throws SQLException {
         checkIfConnected();
         Set<String> columns = data.getNames();
@@ -105,6 +107,7 @@ public class JDBCManager {
      * @return 1 if table was deleted
      * @throws SQLException
      */
+    @Override
     public int dropTable(String tableName) throws SQLException {
         checkIfConnected();
         String query = "DROP TABLE public." + tableName;
@@ -125,6 +128,7 @@ public class JDBCManager {
      * @return int number of updated rows
      * @throws SQLException
      */
+    @Override
     public int updateRows(String tableName, DataSet condition, DataSet data) throws SQLException {
         checkIfConnected();
         StringBuilder query = new StringBuilder(String.format("UPDATE public.%s SET", tableName));
@@ -138,7 +142,7 @@ public class JDBCManager {
             query.append(String.format("%1$s = '%2$s'", colunmName, condition.get(colunmName)));
         }
         int numRows = -1;
-        try(Statement statement = connection.createStatement()){
+        try (Statement statement = connection.createStatement()) {
             numRows = statement.executeUpdate(query.toString());
         } catch (SQLException e) {
             throw e;
@@ -147,13 +151,14 @@ public class JDBCManager {
     }
 
 
+    @Override
     public boolean isConnected() {
         return (connection != null);
     }
 
     private void checkIfConnected() {
         if (connection == null) {
-            throw new RuntimeException("Connection to DB is not established. Please connect to you DB");
+            throw new RuntimeException("Connection to DB is not established. Please connect to your DB");
         }
     }
 }

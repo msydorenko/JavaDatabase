@@ -6,11 +6,11 @@ import java.util.Set;
 public interface DataSet {
     void put(String name, Object object);
 
-    void update(DataSet newData);
-
     Object get(String name);
+
+    void update(DataSet newData);
 
     Set<String> getNames();
 
-    List<Object> getValues(String name);
+    List<Object> getValues();
 }
