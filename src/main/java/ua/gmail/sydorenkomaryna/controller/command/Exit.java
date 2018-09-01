@@ -13,17 +13,17 @@ import java.sql.SQLException;
 public class Exit extends CommonCommand {
     private static final String COMMAND = "exit";
 
-    Exit(View view, DBManager dbManager) {
+    public Exit(View view, DBManager dbManager) {
         super(view, dbManager);
     }
 
     @Override
-    public boolean isExecute(String command) {
-        return command.startsWith(COMMAND);
+    public boolean isExecute(String inputCommand) {
+        return inputCommand.startsWith(COMMAND);
     }
 
     @Override
-    public void execute(String command) {
+    public void execute(String inputCommand) {
         view.write("Goodbye!");
         try {
             dbManager.closeConnection();

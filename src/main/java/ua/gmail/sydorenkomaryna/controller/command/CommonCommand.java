@@ -8,14 +8,17 @@ import ua.gmail.sydorenkomaryna.view.View;
  */
 
 public abstract class CommonCommand implements Command {
-    View view;
-    DBManager dbManager;
+    final View view;
+    final DBManager dbManager;
 
-    CommonCommand(View view, DBManager dbManager){
+    CommonCommand(View view, DBManager dbManager) {
         this.view = view;
         this.dbManager = dbManager;
     }
-    void ErrorMessage(String command) {
-        view.write(String.format("Command '%s' is not allowed", command));
+
+    void errorMessage(String inputCommand) {
+        view.write(String.format("Command '%s' is not allowed! ", inputCommand));
+        view.write("If you want to see list of all commands use command help.");
+
     }
 }

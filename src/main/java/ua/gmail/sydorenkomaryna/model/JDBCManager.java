@@ -34,7 +34,7 @@ public class JDBCManager implements DBManager {
         }
         try {
             connection = DriverManager.getConnection(dbName, userName, password);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(String.format("Connection failed to " +
                     "database: %s as user: %s , url: %s ", dbName, userName), e);
         }
