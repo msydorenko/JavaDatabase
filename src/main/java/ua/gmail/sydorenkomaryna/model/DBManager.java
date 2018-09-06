@@ -14,6 +14,8 @@ public interface DBManager {
 
     int insertData(String tableName, DataSet data) throws SQLException;
 
+    int deleteRow(String nameTable, DataSet dataForDelete) throws SQLException;
+
     int dropTable(String tableName) throws SQLException;
 
     int updateRows(String tableName, DataSet condition, DataSet dataFrom) throws SQLException;

@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Manages data in database
  */
-public class JDBCManager implements DBManager{
+public class JDBCManager implements DBManager {
     private Connection connection;
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/";
 
@@ -97,6 +97,33 @@ public class JDBCManager implements DBManager{
             throw e;
         }
         return numRows;
+    }
+
+    /**
+     * Delete row in table
+     *
+     * @param nameTable
+     * @param dataForDelete as pair of column name and value for part of DELETE statement WHERE column=value
+     * @return number of deleted rows
+     */
+    @Override
+    public int deleteRow(String nameTable, DataSet dataForDelete) throws SQLException {
+        checkIfConnected();
+        StringBuilder query = new StringBuilder();
+        query.append("DELETTE FROM pulic." + nameTable +
+                " WHERE ");
+
+        Set<String> nameColumns = dataForDelete.getNames();
+        for (String name : nameColumns) {
+            query.append(String.format("%1$s = %2$s", name, dataForDelete.get(name)));
+        }
+        int numRow = -1;
+        try (Statement statement = connection.createStatement()) {
+            numRow = statement.executeUpdate(query.toString());
+        } catch (SQLException e) {
+            throw e;
+        }
+        return numRow;
     }
 
     /**
