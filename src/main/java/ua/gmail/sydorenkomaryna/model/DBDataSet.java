@@ -63,52 +63,52 @@ public class DBDataSet implements DataSet {
         return new ArrayList<>(data.values());
     }
 
-   @Override
+    @Override
     public boolean equals(Object dataSet) {
         if (dataSet == null) return false;
         if (this == dataSet) return true;
         if (!(dataSet instanceof DBDataSet)) return false;
 
         Set<String> names = this.getNames();
-        Set<String> dataSetNames = ((DBDataSet) dataSet).getNames();
-        if (names.size() != dataSetNames.size()) return false;
+        Set<String> anotherNames = ((DBDataSet) dataSet).getNames();
+        if (names.size() != anotherNames.size()) return false;
 
-       if (checkNames(names, dataSetNames)) return false;
+        if (checkNames(names, anotherNames)) return false;
 
-       if (checkValues((DBDataSet) dataSet, names)) return false;
-       return true;
+        if (checkValues((DBDataSet) dataSet, names)) return false;
+        return true;
     }
 
     private boolean checkValues(DBDataSet dataSet, Set<String> names) {
         for (String name : names) {
-             try {
-                 if (!this.get(name).equals(dataSet.get(name)))
-                     return false;
-             } catch (Exception e) {
-                 return true;
-             }
-         }
-        return false;
-    }
-
-    private boolean checkNames(Set<String> names, Set<String> dataSetNames) {
-        for (String nameFirs : names) {
-            for (String nameSecond : dataSetNames) {
-                try {
-                    if(!nameFirs.equals(nameSecond))
-                        return false;
-                }catch (Exception e){
-                    return true;
-                }
+            try {
+                if (!this.get(name).equals(dataSet.get(name)))
+                    return false;
+            } catch (Exception e) {
+                return true;
             }
         }
         return false;
     }
 
+    private boolean checkNames(Set<String> names, Set<String> anotherNames) {
+        for (String nameFirs : names) {
+            for (String nameSecond : anotherNames) {
+                try {
+                    if (!nameFirs.equals(nameSecond))
+                        return false;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     public int hashCode() {
-        int hashCode = 0;
         Set<String> names = this.getNames();
+        int hashCode = 0;
         for (String name : names) {
             try {
                 hashCode += name.hashCode() + this.get(name).hashCode();
