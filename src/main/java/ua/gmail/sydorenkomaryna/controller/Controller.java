@@ -25,6 +25,7 @@ public class Controller {
         commands = new ArrayList<>();
         commands.add(new Help(view));
         commands.add(new ConnectToDB(view, dbManager));
+        commands.add(new CreateTable(view, dbManager));
         commands.add(new Exit(view, dbManager));
         //last command
         commands.add(new UnsupportedCommand(view, dbManager));
