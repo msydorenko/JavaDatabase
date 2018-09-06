@@ -11,23 +11,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DBDataSetTest {
     private static DataSet dataSet;
-
-/*    @BeforeEach
-    protected static void setup(){
-        dataSet = new DBDataSet();
-
-
-    }*/
-
-    /*@BeforeAll
-    public static void setup(){
-        DBDataSetTest dbDataSetTest = new DBDataSetTest();
-        dbDataSetTest.dataSet = new DBDataSet();
-    }*/
 
     @BeforeAll
     public static void init() {
@@ -94,16 +80,16 @@ public class DBDataSetTest {
 
     @Test
     public void testHashCode() {
-        int expecteed = "keyName1".hashCode() +
-                "value1".hashCode() + "keyName2".hashCode() +
-                "value2".hashCode() + "keyName3".hashCode() +
-                "newValue".hashCode();
+        DataSet expectedData = new DBDataSet();
+        expectedData.put("keyName1", "value1");
+        expectedData.put("keyName2", "value2");
+        expectedData.put("keyName1", "newValue");
 
-        assertEquals(expecteed, dataSet.hashCode());
+        assertNotEquals(expectedData.hashCode(), dataSet.hashCode());
     }
 
     @Test
     public void testToString() {
-        assertEquals("[name1, name2, name3]", dataSet.toString());
+        assertEquals("[keyName1, keyName2, keyName3]", dataSet.toString());
     }
 }

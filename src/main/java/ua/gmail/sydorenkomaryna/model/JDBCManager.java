@@ -1,19 +1,14 @@
 package ua.gmail.sydorenkomaryna.model;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Set;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Manages data in database
  */
 public class JDBCManager implements DBManager {
     private Connection connection;
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/sqlcmd";
-    private static final String USER_NAME = "postgres";
-    private static final String PASS = "postgres";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/";
 
     /**
      * Opens connection specified user name and password
@@ -33,7 +28,7 @@ public class JDBCManager implements DBManager {
             throw new RuntimeException("JDBC Driver PostgreSQL is not in the library path!", e);
         }
         try {
-            connection = DriverManager.getConnection(dbName, userName, password);
+            connection = DriverManager.getConnection(DB_URL + dbName, userName, password);
         } catch (Exception e) {
             throw new RuntimeException(String.format("Connection failed to " +
                     "database: %s as user: %s , url: %s ", dbName, userName), e);
@@ -45,11 +40,11 @@ public class JDBCManager implements DBManager {
      */
     @Override
     public int createTables(String name, Set<String> columns) throws SQLException {
-        StringBuilder query = new StringBuilder("CREATE TABLE " + name + " (");
+        StringBuilder query = new StringBuilder("CREATE TABLE " + name + " (id SERIAL CONSTRAINT " + name + "PrimaryKey PRIMARY KEY, ");
         for (String col : columns) {
             query.append(col).append(" varchar(40),");
         }
-        //remove last coma sign
+        //remove last comma sign
         query.replace(query.length() - 1, query.length(), ")");
         try (Statement statement = connection.createStatement()) {
             statement.execute(query.toString());
@@ -123,23 +118,23 @@ public class JDBCManager implements DBManager {
      * Updates specified table according to condition
      *
      * @param tableName
-     * @param condition as pair of column name and value for part of UPDATE statement WHERE column=value
-     * @param data      for update as pairs of column name and value for part of UPDATE statement SET column=value
+     * @param condition as pair of column name and value for part of UPDATE statement "WHERE column=value"
+     * @param dataFrom  for update as pairs of column name and value for part of UPDATE statement "SET column=value"
      * @return int number of updated rows
      * @throws SQLException
      */
     @Override
-    public int updateRows(String tableName, DataSet condition, DataSet data) throws SQLException {
+    public int updateRows(String tableName, DataSet condition, DataSet dataFrom) throws SQLException {
         checkIfConnected();
-        StringBuilder query = new StringBuilder(String.format("UPDATE public.%s SET", tableName));
-        Set<String> columns = data.getNames();
+        StringBuilder query = new StringBuilder(String.format("UPDATE public.%s SET ", tableName));
+        Set<String> columns = dataFrom.getNames();
         for (String columnName : columns) {
-            query.append(String.format("%1$s='%2$s',", columnName, data.get(columnName)));
+            query.append(String.format("%1$s='%2$s',", columnName, dataFrom.get(columnName)));
         }
         query.replace(query.length() - 1, query.length(), " WHERE ");
         columns = condition.getNames();
-        for (String colunmName : columns) {
-            query.append(String.format("%1$s = '%2$s'", colunmName, condition.get(colunmName)));
+        for (String columnName : columns) {
+            query.append(String.format("%1$s = '%2$s'", columnName, condition.get(columnName)));
         }
         int numRows = -1;
         try (Statement statement = connection.createStatement()) {
@@ -150,6 +145,103 @@ public class JDBCManager implements DBManager {
         return numRows;
     }
 
+    /**
+     * Delete all rows in table
+     *
+     * @param nameTable
+     * @return int number of updated rows
+     * @throws SQLException
+     */
+    @Override
+    public int truncateTable(String nameTable) {
+        checkIfConnected();
+        String query = "TRUNCATE TABLE public." + nameTable;
+        int numRows = -1;
+        try (Statement st = connection.createStatement()) {
+            numRows = st.executeUpdate(query);
+        } catch (SQLException e) {
+            throw new RuntimeException("TRUNCATE caused an SQLException", e);
+        }
+        return numRows;
+    }
+
+    /**
+     * Get data from specified table
+     *
+     * @param nameTable
+     * @return rows with data
+     * @throws SQLException
+     */
+    @Override
+    public List<DataSet> getTableData(String nameTable) throws SQLException {
+        checkIfConnected();
+        List<DataSet> data = new ArrayList<>();
+        String query = "SELECT * FROM public." + nameTable;
+        try (Statement statement = connection.createStatement();
+             ResultSet resultset = statement.executeQuery(query)) {
+            ResultSetMetaData metaData = resultset.getMetaData();
+            int countColumn = metaData.getColumnCount();
+
+            while (resultset.next()) {
+                DataSet row = new DBDataSet();
+                for (int index = 1; index <= countColumn; index++) {
+                    row.put(metaData.getColumnName(index), resultset.getObject(index));
+                }
+                data.add(row);
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+        return data;
+    }
+
+    /**
+     * Get list of titles columns
+     *
+     * @param nameTable
+     * @return list
+     * @throws SQLException
+     */
+    @Override
+    public Set<String> getNameColumns(String nameTable) throws SQLException {
+        checkIfConnected();
+        Set<String > nameColumn = new LinkedHashSet<>();
+        String query = "SELECT * FROM public." + nameTable;
+        try(Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query)) {
+            ResultSetMetaData metadata = resultSet.getMetaData();
+            int countColumn = metadata.getColumnCount();
+            for (int index = 1; index <= countColumn; index++) {
+                nameColumn.add(metadata.getColumnName(index));
+            }
+        } catch (SQLException e) {
+            throw e;
+        }
+        return nameColumn;
+    }
+
+    /**
+     * Get list of table names
+     *
+     * @return list of existing tables separate comma sign
+     * @throws SQLException
+     */
+    @Override
+    public String getNamesAllTablesInDataBase() throws SQLException{
+        checkIfConnected();
+        StringBuilder result = new StringBuilder();
+        String query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' " +
+                "AND table_type='BASE TABLE'";
+        try(Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query)){
+            while (resultSet.next()){
+            result.append(resultSet.getString("table_name")).append(", ");
+            }
+        }catch (SQLException e){
+            throw e;
+        }
+        return result.substring(0, result.length() - 2);
+    }
 
     @Override
     public boolean isConnected() {

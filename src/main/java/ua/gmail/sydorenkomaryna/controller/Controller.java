@@ -22,7 +22,7 @@ public class Controller {
      */
     public Controller(DBManager dbManager, View view) {
         this.view = view;
-        commands = new ArrayList<Command>();
+        commands = new ArrayList<>();
         commands.add(new Help(view));
         commands.add(new ConnectToDB(view, dbManager));
         commands.add(new Exit(view, dbManager));

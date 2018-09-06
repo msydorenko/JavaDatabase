@@ -121,7 +121,7 @@ public class DBDataSet implements DataSet {
 
     @Override
     public String toString() {
-        return Arrays.deepToString(data.keySet().toArray());
+        return Arrays.toString(data.keySet().toArray());
     }
 }
 
