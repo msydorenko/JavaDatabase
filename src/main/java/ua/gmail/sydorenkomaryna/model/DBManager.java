@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface DBManager {
+
     void makeConnection(String dbName, String userName, String password);
 
     int createTables(String name, Set<String> columns) throws SQLException;
@@ -15,9 +16,9 @@ public interface DBManager {
 
     int dropTable(String tableName) throws SQLException;
 
-    int updateRows(String tableName, DataSet condition, DataSet data) throws SQLException;
+    int updateRows(String tableName, DataSet condition, DataSet dataFrom) throws SQLException;
 
-    int truncateTable(String nameTable) throws SQLException;
+    int truncateTable(String nameTable);
 
     List<DataSet> getTableData(String nameTable) throws SQLException;
 

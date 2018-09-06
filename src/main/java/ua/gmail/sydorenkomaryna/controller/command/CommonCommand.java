@@ -19,6 +19,5 @@ public abstract class CommonCommand implements Command {
     void errorMessage(String inputCommand) {
         view.write(String.format("Command '%s' is not allowed! ", inputCommand));
         view.write("If you want to see list of all commands use command help.");
-
     }
 }
