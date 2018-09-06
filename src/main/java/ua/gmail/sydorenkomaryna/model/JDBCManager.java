@@ -1,12 +1,15 @@
 package ua.gmail.sydorenkomaryna.model;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Manages data in database
  */
-public class JDBCManager implements DBManager {
+public class JDBCManager implements DBManager{
     private Connection connection;
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/";
 
@@ -36,7 +39,8 @@ public class JDBCManager implements DBManager {
     }
 
     /**
-     * Creates table with specified names and columns. All columns are varchar(40)
+     * Creates table with specified names and columns.
+     * First column is autoincrement primary key, other columns are varchar(40)
      */
     @Override
     public int createTables(String name, Set<String> columns) throws SQLException {
@@ -205,10 +209,10 @@ public class JDBCManager implements DBManager {
     @Override
     public Set<String> getNameColumns(String nameTable) throws SQLException {
         checkIfConnected();
-        Set<String > nameColumn = new LinkedHashSet<>();
+        Set<String> nameColumn = new LinkedHashSet<>();
         String query = "SELECT * FROM public." + nameTable;
-        try(Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query)) {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
             ResultSetMetaData metadata = resultSet.getMetaData();
             int countColumn = metadata.getColumnCount();
             for (int index = 1; index <= countColumn; index++) {
@@ -227,17 +231,17 @@ public class JDBCManager implements DBManager {
      * @throws SQLException
      */
     @Override
-    public String getNamesAllTablesInDataBase() throws SQLException{
+    public String getNamesAllTablesInDataBase() throws SQLException {
         checkIfConnected();
         StringBuilder result = new StringBuilder();
         String query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public' " +
                 "AND table_type='BASE TABLE'";
-        try(Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query)){
-            while (resultSet.next()){
-            result.append(resultSet.getString("table_name")).append(", ");
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                result.append(resultSet.getString("table_name")).append(", ");
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             throw e;
         }
         return result.substring(0, result.length() - 2);
