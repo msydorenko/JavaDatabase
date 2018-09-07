@@ -27,6 +27,7 @@ public class Controller {
         commands.add(new ConnectToDB(view, dbManager));
         commands.add(new CreateTable(view, dbManager));
         commands.add(new DeleteRow(view, dbManager));
+        commands.add(new Drop(view, dbManager));
         commands.add(new Exit(view, dbManager));
         //last command
         commands.add(new UnsupportedCommand(view, dbManager));

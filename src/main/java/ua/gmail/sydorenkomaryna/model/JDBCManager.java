@@ -138,11 +138,13 @@ public class JDBCManager implements DBManager {
         checkIfConnected();
         String query = "DROP TABLE public." + tableName;
         try (Statement statement = connection.createStatement()) {
-            statement.execute(query);
+            if (statement.execute(query)) {
+                return 1;
+            }
         } catch (SQLException e) {
             throw e;
         }
-        return 1;
+        return -1;
     }
 
     /**
