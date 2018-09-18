@@ -1,6 +1,6 @@
 package ua.gmail.sydorenkomaryna.controller;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ua.gmail.sydorenkomaryna.controller.command.Command;
@@ -11,32 +11,31 @@ import ua.gmail.sydorenkomaryna.view.View;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ExitTest {
+class ExitTest {
     private static View view;
-    private static DBManager dbManager;
     private static Command command;
 
-    @BeforeAll
-    static void setup() {
+    @BeforeEach
+    void setup() {
+        DBManager dbManager = Mockito.mock(DBManager.class);
         view = Mockito.mock(View.class);
-        dbManager = Mockito.mock(DBManager.class);
         command = new Exit(view, dbManager);
     }
 
     @Test
-    public void testIsExecutableTrue() {
+    void testIsExecutableTrue() {
         boolean result = command.isExecutable("exit");
         assertTrue(result);
     }
 
     @Test
-    public void testIsExecutableFalse() {
+    void testIsExecutableFalse() {
         boolean result = command.isExecutable("qwe");
         assertFalse(result);
     }
 
     @Test
-    public void testExecuteWriteMessage() {
+    void testExecuteWriteMessage() {
         try {
             command.execute("exit");
             fail("Expected ExitException");
@@ -48,7 +47,7 @@ public class ExitTest {
     }
 
     @Test
-    public void testExecuteThrowsExitException() {
+    void testExecuteThrowsExitException() {
         assertThrows(ExitException.class, () -> command.execute("exit"));
     }
 }

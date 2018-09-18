@@ -92,10 +92,7 @@ public class DBDataSet implements DataSet {
     }
 
     private boolean checkNames(Set<String> names, Set<String> anotherNames) {
-        if(names.containsAll(anotherNames)) {
-            return true;
-        }
-        return false;
+        return names.containsAll(anotherNames) ? true : false;
     }
 
     @Override

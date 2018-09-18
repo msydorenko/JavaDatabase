@@ -154,7 +154,7 @@ public class JDBCManager implements DBManager {
      *
      * @param tableName
      * @param oldCondition as pair of column name and value for part of UPDATE statement "WHERE column=value"
-     * @param newCondition  for update as pairs of column name and value for part of UPDATE statement "SET column=value"
+     * @param newCondition for update as pairs of column name and value for part of UPDATE statement "SET column=value"
      * @return int number of updated rows
      * @throws SQLException
      */

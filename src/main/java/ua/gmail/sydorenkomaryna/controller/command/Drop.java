@@ -20,7 +20,7 @@ public class Drop extends CommonCommand {
     @Override
     public void execute(String inputCommand) {
         String[] commandDrop = inputCommand.split("\\|");
-        if (commandDrop.length < 2 && commandDrop[1].trim().length() == 0) {
+        if (commandDrop.length < 2 || commandDrop[1].trim().length() == 0) {
             errorMessage(inputCommand);
             return;
         }

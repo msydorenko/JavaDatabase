@@ -26,7 +26,7 @@ public class CreateTable extends CommonCommand {
             return;
         }
         String tableName = dataForCreatingTable[1].trim();
-        if (tableName.length() == 0) {
+        if (tableName.trim().length() == 0) {
             errorMessage(inputCommand);
             return;
         }

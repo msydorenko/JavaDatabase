@@ -23,13 +23,13 @@ public class DeleteRow extends CommonCommand {
     @Override
     public void execute(String inputCommand) {
         String commandDelete[] = inputCommand.split("\\|");
-        if (commandDelete.length < 4 && commandDelete[1].trim().length() == 0) {
+        if (commandDelete.length < 4 || commandDelete[1].trim().length() == 0) {
             errorMessage(inputCommand);
             return;
         }
         String tableName = commandDelete[1].trim();
         DataSet dataSet = new DBDataSet();
-        dataSet.put(commandDelete[3].trim(), commandDelete[4].trim());
+        dataSet.put(commandDelete[2].trim(), commandDelete[3].trim());
         try {
             int number = dbManager.deleteRow(tableName, dataSet);
             if (number == -1) {

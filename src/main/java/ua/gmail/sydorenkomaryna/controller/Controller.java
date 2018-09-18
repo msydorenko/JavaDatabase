@@ -30,6 +30,7 @@ public class Controller {
         commands.add(new Drop(view, dbManager));
         commands.add(new Exit(view, dbManager));
         commands.add(new Insert(view, dbManager));
+        commands.add(new ViewData(view, dbManager));
         //last command
         commands.add(new UnsupportedCommand(view, dbManager));
     }
