@@ -9,7 +9,7 @@ public class DBDataSet implements DataSet {
     private final Map<String, Object> data = new LinkedHashMap<>();
 
     /**
-     * Adds assosiation of given name and value to the DataSet
+     * Adds association of given name and value to the DataSet
      *
      * @param name   is name of column
      * @param object is value of column
@@ -73,9 +73,9 @@ public class DBDataSet implements DataSet {
         Set<String> anotherNames = ((DBDataSet) dataSet).getNames();
         if (names.size() != anotherNames.size()) return false;
 
-        if (checkNames(names, anotherNames)) return false;
+        if (!checkNames(names, anotherNames)) return false;
 
-        if (checkValues((DBDataSet) dataSet, names)) return false;
+        if (!checkValues((DBDataSet) dataSet, names)) return false;
         return true;
     }
 
@@ -85,24 +85,17 @@ public class DBDataSet implements DataSet {
                 if (!this.get(name).equals(dataSet.get(name)))
                     return false;
             } catch (Exception e) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean checkNames(Set<String> names, Set<String> anotherNames) {
-        for (String nameFirs : names) {
-            for (String nameSecond : anotherNames) {
-                try {
-                    if (!nameFirs.equals(nameSecond))
-                        return false;
-                } catch (Exception e) {
-                    return false;
-                }
+                return false;
             }
         }
         return true;
+    }
+
+    private boolean checkNames(Set<String> names, Set<String> anotherNames) {
+        if(names.containsAll(anotherNames)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

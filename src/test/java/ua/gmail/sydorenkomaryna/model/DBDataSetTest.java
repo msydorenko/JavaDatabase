@@ -16,7 +16,7 @@ public class DBDataSetTest {
     private static DataSet dataSet;
 
     @BeforeAll
-    public static void init() {
+    public static void setup() {
         dataSet = new DBDataSet();
         dataSet.put("keyName1", "value1");
         dataSet.put("keyName2", "value2");
@@ -30,13 +30,13 @@ public class DBDataSetTest {
 
     @Test
     public void testUpdate() {
-        DataSet newDataSet1 = new DBDataSet();
-        newDataSet1.put("keyName3", "newValue");
+        DataSet dataForUpdate = new DBDataSet();
+        dataForUpdate.put("keyName3", "newValue");
         DataSet expectedData = new DBDataSet();
         expectedData.put("keyName1", "value1");
         expectedData.put("keyName2", "value2");
         expectedData.put("keyName3", "newValue");
-        dataSet.update(newDataSet1);
+        dataSet.update(dataForUpdate);
 
         assertEquals(expectedData, dataSet);
     }
@@ -66,7 +66,7 @@ public class DBDataSetTest {
         DataSet newDataSet = new DBDataSet();
         newDataSet.put("keyName1", "value1");
         newDataSet.put("keyName2", "value2");
-        newDataSet.put("keyName3", "newValue");
+        newDataSet.put("keyName3", "value3");
 
         assertEquals(newDataSet, dataSet);
     }
@@ -83,9 +83,9 @@ public class DBDataSetTest {
         DataSet expectedData = new DBDataSet();
         expectedData.put("keyName1", "value1");
         expectedData.put("keyName2", "value2");
-        expectedData.put("keyName1", "newValue");
+        expectedData.put("keyName3", "value3");
 
-        assertNotEquals(expectedData.hashCode(), dataSet.hashCode());
+        assertEquals(expectedData.hashCode(), dataSet.hashCode());
     }
 
     @Test

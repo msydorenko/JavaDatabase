@@ -18,7 +18,7 @@ public class Exit extends CommonCommand {
     }
 
     @Override
-    public boolean isExecute(String inputCommand) {
+    public boolean isExecutable(String inputCommand) {
         return inputCommand.startsWith(COMMAND);
     }
 

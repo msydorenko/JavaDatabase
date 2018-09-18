@@ -34,7 +34,7 @@ public class JDBCManager implements DBManager {
             connection = DriverManager.getConnection(DB_URL + dbName, userName, password);
         } catch (Exception e) {
             throw new RuntimeException(String.format("Connection failed to " +
-                    "database: %s as user: %s , url: %s ", dbName, userName), e);
+                    "database: %s as user: %s.", dbName, userName), e);
         }
     }
 
@@ -43,13 +43,15 @@ public class JDBCManager implements DBManager {
      * First column is autoincrement primary key, other columns are varchar(40)
      */
     @Override
-    public int createTables(String name, Set<String> columns) throws SQLException {
-        StringBuilder query = new StringBuilder("CREATE TABLE " + name + " (id SERIAL CONSTRAINT " + name + "PrimaryKey PRIMARY KEY, ");
+    public int createTables(String tableName, Set<String> columns) throws SQLException {
+        checkIfConnected();
+        StringBuilder query = new StringBuilder("CREATE TABLE " + tableName);
+        query.append(" (id SERIAL CONSTRAINT " + tableName + "PrimaryKey PRIMARY KEY, ");
         for (String col : columns) {
             query.append(col).append(" varchar(40),");
         }
         //remove last comma sign
-        query.replace(query.length() - 1, query.length(), ")");
+        query.replace(query.length() - 1, query.length(), ");");
         try (Statement statement = connection.createStatement()) {
             statement.execute(query.toString());
         } catch (SQLException e) {
@@ -102,15 +104,15 @@ public class JDBCManager implements DBManager {
     /**
      * Delete row in table
      *
-     * @param nameTable
+     * @param tableName
      * @param dataForDelete as pair of column name and value for part of DELETE statement WHERE column=value
      * @return number of deleted rows
      */
     @Override
-    public int deleteRow(String nameTable, DataSet dataForDelete) throws SQLException {
+    public int deleteRow(String tableName, DataSet dataForDelete) throws SQLException {
         checkIfConnected();
         StringBuilder query = new StringBuilder();
-        query.append("DELETTE FROM pulic." + nameTable +
+        query.append("DELETTE FROM pulic." + tableName +
                 " WHERE ");
 
         Set<String> nameColumns = dataForDelete.getNames();
@@ -151,23 +153,23 @@ public class JDBCManager implements DBManager {
      * Updates specified table according to condition
      *
      * @param tableName
-     * @param condition as pair of column name and value for part of UPDATE statement "WHERE column=value"
-     * @param dataFrom  for update as pairs of column name and value for part of UPDATE statement "SET column=value"
+     * @param oldCondition as pair of column name and value for part of UPDATE statement "WHERE column=value"
+     * @param newCondition  for update as pairs of column name and value for part of UPDATE statement "SET column=value"
      * @return int number of updated rows
      * @throws SQLException
      */
     @Override
-    public int updateRows(String tableName, DataSet condition, DataSet dataFrom) throws SQLException {
+    public int updateRows(String tableName, DataSet oldCondition, DataSet newCondition) throws SQLException {
         checkIfConnected();
         StringBuilder query = new StringBuilder(String.format("UPDATE public.%s SET ", tableName));
-        Set<String> columns = dataFrom.getNames();
+        Set<String> columns = newCondition.getNames();
         for (String columnName : columns) {
-            query.append(String.format("%1$s='%2$s',", columnName, dataFrom.get(columnName)));
+            query.append(String.format("%1$s='%2$s',", columnName, newCondition.get(columnName)));
         }
         query.replace(query.length() - 1, query.length(), " WHERE ");
-        columns = condition.getNames();
+        columns = oldCondition.getNames();
         for (String columnName : columns) {
-            query.append(String.format("%1$s = '%2$s'", columnName, condition.get(columnName)));
+            query.append(String.format("%1$s = '%2$s'", columnName, oldCondition.get(columnName)));
         }
         int numRows = -1;
         try (Statement statement = connection.createStatement()) {
@@ -181,14 +183,14 @@ public class JDBCManager implements DBManager {
     /**
      * Delete all rows in table
      *
-     * @param nameTable
+     * @param tableName
      * @return int number of updated rows
      * @throws SQLException
      */
     @Override
-    public int truncateTable(String nameTable) {
+    public int truncateTable(String tableName) {
         checkIfConnected();
-        String query = "TRUNCATE TABLE public." + nameTable;
+        String query = "TRUNCATE TABLE public." + tableName;
         int numRows = -1;
         try (Statement st = connection.createStatement()) {
             numRows = st.executeUpdate(query);
@@ -201,15 +203,15 @@ public class JDBCManager implements DBManager {
     /**
      * Get data from specified table
      *
-     * @param nameTable
+     * @param tableName
      * @return rows with data
      * @throws SQLException
      */
     @Override
-    public List<DataSet> getTableData(String nameTable) throws SQLException {
+    public List<DataSet> getTableData(String tableName) throws SQLException {
         checkIfConnected();
         List<DataSet> data = new ArrayList<>();
-        String query = "SELECT * FROM public." + nameTable;
+        String query = "SELECT * FROM public." + tableName;
         try (Statement statement = connection.createStatement();
              ResultSet resultset = statement.executeQuery(query)) {
             ResultSetMetaData metaData = resultset.getMetaData();
@@ -231,15 +233,15 @@ public class JDBCManager implements DBManager {
     /**
      * Get list of titles columns
      *
-     * @param nameTable
+     * @param tableName
      * @return list
      * @throws SQLException
      */
     @Override
-    public Set<String> getNameColumns(String nameTable) throws SQLException {
+    public Set<String> getNameColumns(String tableName) throws SQLException {
         checkIfConnected();
         Set<String> nameColumn = new LinkedHashSet<>();
-        String query = "SELECT * FROM public." + nameTable;
+        String query = "SELECT * FROM public." + tableName;
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             ResultSetMetaData metadata = resultSet.getMetaData();

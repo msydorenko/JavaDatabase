@@ -29,6 +29,7 @@ public class Controller {
         commands.add(new DeleteRow(view, dbManager));
         commands.add(new Drop(view, dbManager));
         commands.add(new Exit(view, dbManager));
+        commands.add(new Insert(view, dbManager));
         //last command
         commands.add(new UnsupportedCommand(view, dbManager));
     }
@@ -42,7 +43,7 @@ public class Controller {
                 try {
                     String input = view.read().trim();
                     for (Command command : commands) {
-                        if (command.isExecute(input)) {
+                        if (command.isExecutable(input)) {
                             command.execute(input);
                             break;
                         }

@@ -13,7 +13,7 @@ public class UnsupportedCommand extends CommonCommand {
     }
 
     @Override
-    public boolean isExecute(String inputCommand) {
+    public boolean isExecutable(String inputCommand) {
         return true;
     }
 

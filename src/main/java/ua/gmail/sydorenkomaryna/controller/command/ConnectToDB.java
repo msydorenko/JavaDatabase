@@ -14,7 +14,7 @@ public class ConnectToDB extends CommonCommand {
     }
 
     @Override
-    public boolean isExecute(String inputCommand) {
+    public boolean isExecutable(String inputCommand) {
         return inputCommand.startsWith(COMMAND);
     }
 
@@ -36,6 +36,7 @@ public class ConnectToDB extends CommonCommand {
             String password = dbParam[3].trim();
 
             dbManager.makeConnection(dbName, userName, password);
+            view.write("You are connected to your DB!");
         } catch (Exception e) {
             view.write("You made a mistake!");
             view.write("See details below.");

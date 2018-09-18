@@ -2,7 +2,7 @@ package ua.gmail.sydorenkomaryna.model;
 
 public class JDBCManagerTest extends DBManagerTest {
     @Override
-    DBManager getDBManager(){
+    DBManager getDBManager() {
         return new JDBCManager();
     }
 }

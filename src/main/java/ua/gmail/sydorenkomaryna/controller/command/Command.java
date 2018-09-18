@@ -5,6 +5,6 @@ package ua.gmail.sydorenkomaryna.controller.command;
  */
 
 public interface Command {
-    boolean isExecute(String inputCommand);
+    boolean isExecutable(String inputCommand);
     void execute(String inputCommand);
 }

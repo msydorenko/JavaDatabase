@@ -2,96 +2,113 @@ package ua.gmail.sydorenkomaryna.model;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ua.gmail.sydorenkomaryna.view.Console;
 import ua.gmail.sydorenkomaryna.view.View;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class DBManagerTest {
     private DBManager dbManager;
-    View console = new Console();
+    private View view = new Console();
+    String DB_NAME = "sqlcmd";
+    String USER_NAME = "postgres";
+    String PASSWORD = "postgres";
 
     abstract DBManager getDBManager();
 
-    final String URL = "sqlcmd";
-    final String USER = "postgres";
-    final String PASS = "postgres";
-
     @BeforeEach
-    public void setup() {
+    void setup() {
         dbManager = getDBManager();
+        dbManager.makeConnection(DB_NAME, USER_NAME, PASSWORD);
+        createTable();
+    }
+
+    private void createTable() {
+        Set<String> columnName = new LinkedHashSet<>(3);
+        columnName.add("FirstName");
+        columnName.add("LastName");
+        columnName.add("Country");
+
         try {
-            dbManager.makeConnection(URL, USER, PASS);
-        } catch (Exception e) {
-            console.write("Can't connect to database. The reason is:" + e.getMessage());
+            dbManager.createTables("test", columnName);
+        } catch (SQLException e) {
+            view.write("Can't create table!");
         }
     }
 
     @AfterEach
-    public void leave() throws SQLException {
-        // dropTable();
-        dbManager.closeConnection();
+    void tearDown() {
+        dropTable();
+        try {
+            dbManager.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void dropTable() {
+        try {
+            dbManager.dropTable("test");
+        } catch (SQLException e) {
+            view.write("Table wasn't delete!");
+        }
     }
 
     @Test
-    @DisplayName("should return true if connect is exist")
-    public void testIfConnectIsExist() {
+    void testIsConnected() {
         assertTrue(dbManager.isConnected());
     }
 
     @Test
-    @DisplayName("method should return 1 if table was created")
-    public void testCreateTables() {
-        Set<String> columnNames = new LinkedHashSet<>();
-        columnNames.add("LastName");
-        columnNames.add("FirstName");
-        columnNames.add("Country");
-        try {
-            dbManager.createTables("testTable", columnNames);
-        } catch (SQLException e) {
-            console.write("Can't create table");
-        }
-        assertEquals(1, 1);
+    void testInsertData() throws SQLException {
+        DataSet row = new DBDataSet();
+        row.put("firstname", "value1");
+        row.put("lastname", "value2");
+        row.put("country", "value3");
+        dbManager.insertData("test", row);
+        List<DataSet> result = dbManager.getTableData("test");
+        DataSet expectedRowFromTable = new DBDataSet();
+        expectedRowFromTable.put("id", "1");
+        expectedRowFromTable.put("firstname", "value1");
+        expectedRowFromTable.put("lastname", "value2");
+        expectedRowFromTable.put("country", "value3");
+
+        assertEquals(expectedRowFromTable.getValues().toString(), result.get(0).getValues().toString());
     }
 
     @Test
-    @DisplayName("method insertData should return 1 if row was insert")
-    public void testInsertData() throws SQLException {
-        DataSet newRow = new DBDataSet();
-        newRow.put("LastName", "Jon");
-        newRow.put("FirstName", "Bush");
-        newRow.put("Country", "USA");
+    void testUpdateRows() throws SQLException {
+        DataSet row = new DBDataSet();
+        row.put("firstname", "value1");
+        row.put("lastname", "value2");
+        row.put("country", "value3");
+        dbManager.insertData("test", row);
+        DataSet oldCondition = new DBDataSet();
+        oldCondition.put("id", "1");
+        DataSet newCondition = new DBDataSet();
+        newCondition.put("country", "USA");
+        dbManager.updateRows("test", oldCondition, newCondition);
+        List<DataSet> result = dbManager.getTableData("test");
 
-        dbManager.insertData("testtable", newRow);
-        assertEquals(1, 1);
+        DataSet expectedData = new DBDataSet();
+        expectedData.put("id", "1");
+        expectedData.put("firstname", "value1");
+        expectedData.put("lastname", "value2");
+        expectedData.put("country", "USA");
+
+        assertEquals(expectedData.getValues().toString(), result.get(0).getValues().toString());
     }
 
     @Test
-    public void testGetNamesAllTablesInDataBase() throws SQLException {
-        assertEquals("user, testtable", dbManager.getNamesAllTablesInDataBase());
+    void testGetNamesAllTablesInDataBase() throws SQLException {
+        String result = dbManager.getNamesAllTablesInDataBase();
+        assertTrue(result.contains("test"));
     }
-
-
-    @Test
-    public void testTruncateTable() throws SQLException {
-        dbManager.truncateTable("testtable");
-
-        assertEquals(1, 1);
-    }
-
-
-    /*@Test
-    @DisplayName("method should return 1 if table was deleted")
-    public void testDropTable() throws SQLException {
-        dbManager.dropTable("testtable");
-
-        assertEquals(1,1);
-
-    }*/
 }

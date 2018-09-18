@@ -14,29 +14,28 @@ public class CreateTable extends CommonCommand {
     }
 
     @Override
-    public boolean isExecute(String inputCommand) {
+    public boolean isExecutable(String inputCommand) {
         return inputCommand.startsWith(COMMAND);
     }
 
     @Override
     public void execute(String inputCommand) {
-        String[] commandCreate = inputCommand.split("\\|");
-        if (commandCreate.length <= 2) {
+        String[] dataForCreatingTable = inputCommand.split("\\|");
+        if (dataForCreatingTable.length <= 2) {
             errorMessage(inputCommand);
             return;
         }
-        String tableName = commandCreate[1].trim();
+        String tableName = dataForCreatingTable[1].trim();
         if (tableName.length() == 0) {
             errorMessage(inputCommand);
             return;
         }
-        int result = -1;
         try {
             Set<String> columnsName = new LinkedHashSet<>();
-            for (int index = 2; index < commandCreate.length; index++) {
-                columnsName.add(commandCreate[index].trim());
+            for (int index = 2; index < dataForCreatingTable.length; index++) {
+                columnsName.add(dataForCreatingTable[index].trim());
             }
-            result = dbManager.createTables(tableName, columnsName);
+            int result = dbManager.createTables(tableName, columnsName);
             if (result == -1) {
                 view.write(String.format("This table '%s' wasn't created. You can see logs and find reasons", tableName));
             }else {

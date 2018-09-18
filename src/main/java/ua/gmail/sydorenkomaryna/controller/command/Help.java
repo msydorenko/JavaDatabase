@@ -11,7 +11,7 @@ public class Help implements Command {
     }
 
     @Override
-    public boolean isExecute(String inputCommand) {
+    public boolean isExecutable(String inputCommand) {
         return inputCommand.equals(COMMAND);
     }
 

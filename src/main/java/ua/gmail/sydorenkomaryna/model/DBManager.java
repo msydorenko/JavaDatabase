@@ -8,23 +8,23 @@ public interface DBManager {
 
     void makeConnection(String dbName, String userName, String password);
 
-    int createTables(String name, Set<String> columns) throws SQLException;
+    int createTables(String tableName, Set<String> columns) throws SQLException;
 
     void closeConnection() throws SQLException;
 
     int insertData(String tableName, DataSet data) throws SQLException;
 
-    int deleteRow(String nameTable, DataSet dataForDelete) throws SQLException;
+    int deleteRow(String tableName, DataSet dataForDelete) throws SQLException;
 
     int dropTable(String tableName) throws SQLException;
 
     int updateRows(String tableName, DataSet condition, DataSet dataFrom) throws SQLException;
 
-    int truncateTable(String nameTable);
+    int truncateTable(String tableName);
 
-    List<DataSet> getTableData(String nameTable) throws SQLException;
+    List<DataSet> getTableData(String tableName) throws SQLException;
 
-    Set<String> getNameColumns(String nameTable) throws SQLException;
+    Set<String> getNameColumns(String tableName) throws SQLException;
 
     String getNamesAllTablesInDataBase() throws SQLException;
 
