@@ -43,6 +43,5 @@ public class ViewData extends CommonCommand {
             view.write(String.format("Can't show data of '%s' table. " +
                     "The reason is %s", tableName, e.getMessage()));
         }
-
     }
 }

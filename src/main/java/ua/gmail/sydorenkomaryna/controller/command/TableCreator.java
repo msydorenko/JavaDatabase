@@ -53,9 +53,10 @@ public class TableCreator {
 
     private static String borderRow(int columnCount) {
         StringBuilder result = new StringBuilder(HSEPARATOR);
-        result.append(Collections.nCopies(SIZE_COLUMN, HBORDER));
-//        result.append(String.join())
-        result.append(HSEPARATOR);
+        for (int i = 0; i < columnCount; i++) {
+            result.append(String.join("", Collections.nCopies(SIZE_COLUMN, HBORDER)));
+            result.append(HSEPARATOR);
+        }
         result.append(System.lineSeparator());
         return result.toString();
     }
