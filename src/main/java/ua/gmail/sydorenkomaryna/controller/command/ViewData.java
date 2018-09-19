@@ -31,7 +31,7 @@ public class ViewData extends CommonCommand {
         try {
             List<DataSet> rows = dbManager.getTableData(tableName);
             if (rows == null) {
-                view.write(String.format("Can't show data from table '%s'!", tableName));
+                view.write(String.format("Cannot show data from table '%s'!", tableName));
             } else if (rows.size() == 0) {
                 view.write(String.format("Table '%s' is empty", tableName));
             } else {

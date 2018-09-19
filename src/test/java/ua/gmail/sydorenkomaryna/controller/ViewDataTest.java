@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class ViewDataTest {
@@ -25,14 +27,14 @@ public class ViewDataTest {
     private static Command command;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         dbManager = mock(DBManager.class);
-        view  = mock(View.class);
+        view = mock(View.class);
         command = new ViewData(view, dbManager);
     }
 
     @Test
-    void testExecuteWithCorrectData(){
+    void testExecuteWithCorrectData() {
         try {
             Set<String> columnsName = new LinkedHashSet<>();
             columnsName.add("id");
@@ -76,5 +78,63 @@ public class ViewDataTest {
                 ", The End!]", captor.getAllValues().toString());
     }
 
+    @Test
+    void testExecuteWithNull() {
+        try {
+            when(dbManager.getTableData("test")).thenReturn(null);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        command.execute("find|test");
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(view).write(captor.capture());
+        assertEquals("[Can't show data from table 'test'!]", captor.getAllValues().toString());
+
+    }
+
+    @Test
+    void testExecuteWithEmptyList() {
+        try {
+            when(dbManager.getTableData("test"))
+                    .thenReturn(new ArrayList<>());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        command.execute("find|test");
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(view).write(captor.capture());
+        assertEquals("[Table 'test' is empty]", captor.getAllValues().toString());
+    }
+
+    @Test
+    void testExecuteWithWrongLength() {
+        command.execute("find");
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(view, atLeastOnce()).write(captor.capture());
+        assertEquals("[Command 'find' is not allowed! ," +
+                        " If you want to see list of all commands use command help.]",
+                captor.getAllValues().toString());
+    }
+
+    @Test
+    void testExecuteWithEmptyTableName() {
+        command.execute("find|   ");
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(view, atLeastOnce()).write(captor.capture());
+        assertEquals("[Command 'find|   ' is not allowed! ," +
+                        " If you want to see list of all commands use command help.]",
+                captor.getAllValues().toString());
+    }
+
+    @Test
+    void testIsExecutable() {
+        assertTrue(command.isExecutable("find|test"));
+    }
+
+    @Test
+    void testIsNotexecutable(){
+        assertFalse(command.isExecutable("fffind|test"));
+    }
 
 }

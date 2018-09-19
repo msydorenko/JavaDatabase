@@ -42,15 +42,6 @@ public class TableCreator {
         return result.toString();
     }
 
-    private static String header(Set<String> columns) {
-        StringBuilder result = new StringBuilder(SEPARATOR);
-        for (String column : columns) {
-            result.append(String.format("%-" + SIZE_COLUMN + "s", column)).append(SEPARATOR);
-        }
-        result.append(System.lineSeparator());
-        return result.toString();
-    }
-
     private static String borderRow(int columnCount) {
         StringBuilder result = new StringBuilder(HSEPARATOR);
         for (int i = 0; i < columnCount; i++) {
@@ -61,4 +52,12 @@ public class TableCreator {
         return result.toString();
     }
 
+    private static String header(Set<String> columns) {
+        StringBuilder result = new StringBuilder(SEPARATOR);
+        for (String column : columns) {
+            result.append(String.format("%-" + SIZE_COLUMN + "s", column)).append(SEPARATOR);
+        }
+        result.append(System.lineSeparator());
+        return result.toString();
+    }
 }
