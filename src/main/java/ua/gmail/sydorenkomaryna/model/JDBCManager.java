@@ -1,17 +1,29 @@
 package ua.gmail.sydorenkomaryna.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Manages data in database
  */
 public class JDBCManager implements DBManager {
+    private static Logger LOG = LogManager.getLogger(JDBCManager.class.getName());
     private Connection connection;
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/";
+    private static final String DB_DRIVER;
+    private static final String DB_URL;
+    private static final String HOST;
+    private static final String PORT;
+
+    static {
+        ResourceBundle bundle = ResourceBundle.getBundle("jdbc");
+        DB_DRIVER = bundle.getString("database.driver");
+        DB_URL = bundle.getString("database.url");
+        HOST = bundle.getString("database.server");
+        PORT = bundle.getString("database.port");
+    }
 
     /**
      * Opens connection specified user name and password
@@ -23,19 +35,25 @@ public class JDBCManager implements DBManager {
     @Override
     public void makeConnection(String dbName, String userName, String password) {
         if (connection != null) {
+            LOG.trace("Connection already exist");
             return;
         }
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
+            LOG.error(e);
             throw new RuntimeException("JDBC Driver PostgreSQL is not in the library path!", e);
         }
+        String url = DB_URL + HOST + ":" + PORT + "/";
+        LOG.trace("Trying to connect to DB with url='{}'", url);
         try {
-            connection = DriverManager.getConnection(DB_URL + dbName, userName, password);
+            connection = DriverManager.getConnection(url + dbName, userName, password);
         } catch (Exception e) {
+            LOG.error(e);
             throw new RuntimeException(String.format("Connection failed to " +
                     "database: %s as user: %s.", dbName, userName), e);
         }
+        LOG.trace("Connection has been created");
     }
 
     /**
