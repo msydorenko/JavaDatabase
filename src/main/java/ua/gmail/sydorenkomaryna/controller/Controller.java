@@ -1,5 +1,7 @@
 package ua.gmail.sydorenkomaryna.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.gmail.sydorenkomaryna.controller.command.*;
 import ua.gmail.sydorenkomaryna.model.DBManager;
 import ua.gmail.sydorenkomaryna.view.View;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
  */
 
 public class Controller {
+    private final static Logger LOG = LogManager.getLogger();
     private View view;
     private ArrayList<Command> commands;
 
@@ -31,6 +34,9 @@ public class Controller {
         commands.add(new Exit(view, dbManager));
         commands.add(new Insert(view, dbManager));
         commands.add(new ViewData(view, dbManager));
+        commands.add(new Update(view, dbManager));
+        commands.add(new TablesList(view, dbManager));
+        commands.add(new Clear(view, dbManager));
         //last command
         commands.add(new UnsupportedCommand(view, dbManager));
     }
@@ -53,14 +59,14 @@ public class Controller {
                     if (e instanceof ExitException)
                         throw e;
                     else {
+                        LOG.warn(e);
                         view.write(e.getMessage());
                     }
                     break;
                 }
             }
         } catch (ExitException e) {
-            //NOP
+            LOG.traceExit();
         }
-
     }
 }

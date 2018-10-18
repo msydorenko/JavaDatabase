@@ -12,14 +12,12 @@ import java.util.*;
 public class JDBCManager implements DBManager {
     private static Logger LOG = LogManager.getLogger(JDBCManager.class.getName());
     private Connection connection;
-    private static final String DB_DRIVER;
     private static final String DB_URL;
     private static final String HOST;
     private static final String PORT;
 
     static {
         ResourceBundle bundle = ResourceBundle.getBundle("jdbc");
-        DB_DRIVER = bundle.getString("database.driver");
         DB_URL = bundle.getString("database.url");
         HOST = bundle.getString("database.server");
         PORT = bundle.getString("database.port");

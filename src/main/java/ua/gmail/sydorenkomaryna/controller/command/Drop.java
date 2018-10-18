@@ -19,21 +19,25 @@ public class Drop extends CommonCommand {
 
     @Override
     public void execute(String inputCommand) {
-        String[] commandDrop = inputCommand.split("\\|");
-        if (commandDrop.length < 2 || commandDrop[1].trim().length() == 0) {
+        LOG.traceEntry();
+        String[] cmdParams = inputCommand.split("\\|");
+        if (cmdParams.length < 2 || cmdParams[1].trim().length() == 0) {
             errorMessage(inputCommand);
             return;
         }
-        String nameTable = commandDrop[1].trim();
+        String tableName = cmdParams[1].trim();
+        int result = -1;
         try {
-            int result = dbManager.dropTable(nameTable);
+            result = dbManager.dropTable(tableName);
             if (result == -1) {
-                view.write(String.format("Table '%s' wasn't deleted. Pleas see logs.", nameTable));
-            } else {
-                view.write(String.format("Table '%s' was successfully deleted", nameTable));
-            }
+                LOG.warn("Table '{}' wasn't deleted. Please see the reason in logs", tableName);
+                view.write(String.format("Table '%s' wasn't deleted. Please see the reason in logs", tableName));
+            } else
+                view.write(String.format("Table '%s' was successfully deleted", tableName));
         } catch (Exception e) {
-            view.write(String.format("Table '%s' wasn't deleted. The reason is: %s", nameTable, e.getMessage()));
+            LOG.error("", e);
+            view.write(String.format("Table '%s' wasn't deleted. The reason is: %s", tableName, e.getMessage()));
         }
+        LOG.traceExit();
     }
 }

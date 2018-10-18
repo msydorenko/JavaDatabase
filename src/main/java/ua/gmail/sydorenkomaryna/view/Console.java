@@ -3,6 +3,8 @@ package ua.gmail.sydorenkomaryna.view;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * Implementation of View interface for Console input and output
@@ -27,9 +29,10 @@ public class Console implements View {
      */
     @Override
     public String read() {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in))) {
-            return in.readLine();
-        } catch (IOException e) {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            return scanner.nextLine();
+        } catch (NoSuchElementException e) {
             return null;
         }
     }

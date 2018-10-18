@@ -20,7 +20,9 @@ public class ConnectToDB extends CommonCommand {
 
     @Override
     public void execute(String inputCommand) {
+        LOG.traceEntry();
         connectToDB(inputCommand);
+        LOG.traceExit();
     }
 
     private void connectToDB(String inputCommand) {
@@ -42,6 +44,7 @@ public class ConnectToDB extends CommonCommand {
             view.write("See details below.");
 
             view.write(e.getMessage());
+            LOG.error("", e);
         }
     }
 }

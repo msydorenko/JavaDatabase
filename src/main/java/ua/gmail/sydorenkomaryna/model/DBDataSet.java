@@ -98,10 +98,12 @@ public class DBDataSet implements DataSet {
     @Override
     public int hashCode() {
         Set<String> names = this.getNames();
-        int hashCode = 0;
+        final int prime = 31;
+        int hashCode = 17;
         for (String name : names) {
             try {
-                hashCode += name.hashCode() + this.get(name).hashCode();
+                hashCode += (prime * hashCode) + ((name == null) ? 0 : name.hashCode())
+                        + ((this.get(name) == null) ? 0 : this.get(name).hashCode());
             } catch (NullPointerException e) {
                 hashCode += 0;
             }
